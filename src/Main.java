@@ -1,5 +1,9 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -30,37 +34,46 @@ public class Main {
             }
         }
 
-        int lineCount = 0; //счетчик строк
-        int minLength = Integer.MAX_VALUE;
-        int maxLength = Integer.MIN_VALUE;//символы в строке
-            try (
+        int lineCount = 0; //текст строки
+        String minLength = null;
+        String maxLength = null;//символы в строке
+        List<String> all = new ArrayList<>();
+        try (
                     FileReader fileReader = new FileReader(path);
                     BufferedReader reader = new BufferedReader(fileReader)
             ) {
-                String line;
+                String line = ""; //содержимое строки
+                String firstBrackets = Arrays.toString("\\((.*?)\\)".split(line)); // взяли часть между скобок
+            List<String> fragment = new ArrayList<>();
                 while ((line = reader.readLine()) != null) {
-                    int length = line.length();
+                    all.add(line);//сами строки
                     lineCount++;
-                    if (length < minLength) {
-                        minLength = length;
+                    String[] parts = firstBrackets.split(";"); //разделили по точке с запятой
+                    if (parts.length >= 2) {
+                         fragment.add(parts[0].trim());//добавляем фрагменты в массив и удаляем пробелы
+                         fragment.add(parts[1].trim().split("/")); // часть до слеша без пробелов
                     }
-                    if (length > maxLength) {
-                        maxLength = length;
+
+
+                    if (minLength == null || line.length() < minLength.length()) {
+                        minLength = line;
                     }
-                    if (length > maxLenghtLine) {
+                    if (maxLength == null || line.length() > maxLength.length()) {
+                        maxLength = line;
+                    }
+                    if (line.length() > maxLenghtLine) {
                         throw new RuntimeException("В файле присутствует строка длиннее 1024 символов ");
                     }
                 }
+            String finalMaxLength = maxLength;
+            List<String> filteredLines = all.stream()
+                    .filter(line -> !line.equals(minLength) && !line.equals(maxLength)).collect(Collectors.toList());
             } catch(RuntimeException e){
                     System.err.println("Ошибка строки");
                     e.printStackTrace();
                 } catch(IOException e){
                     System.err.println("Произошла ошибка при чтении файла");
                     e.printStackTrace();
-                } finally{
-                    System.out.println("Длина самой длинной строки в файле: " + maxLength);
-                    System.out.println("Длина самой короткой строки в файле: " + minLength);
-                    System.out.println("Общее количество строк в файле: " + lineCount);
                 }
-            }
         }
+            }
