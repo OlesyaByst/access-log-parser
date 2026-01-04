@@ -33,22 +33,29 @@ public class Main {
 
 
         LogParser parser = new LogParser();
+        Statistics stats = new Statistics();
+
 
         try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
-            String line; // Переменная, в которую мы будем по очереди сохранять каждую строку из файла.
-            while ((line = reader.readLine()) != null) { // reader.readLine() читаем строку
-                parser.parseLine(line); //текущую строку передаем в класс LogParsler
+            String line;
+            while ((line = reader.readLine()) != null) {
+                parser.parseLine(line);
+                try {
+                    LogEntry entry = new LogEntry(line);
+                    stats.addEntry(entry);
+                } catch (Exception e) {
+                }
             }
-
-            System.out.println("Количество строк в файле: " + parser.getTotalLines());
-            System.out.println("Запросов от Googlebot: " + parser.getGoogleBotCount());
-            System.out.println("Запросов от YandexBot: " + parser.getYandexBotCount());
-
-            System.out.printf("Доля Googlebot: %.2f%%\n", parser.calculateGoogleShare());
-            System.out.printf("Доля YandexBot: %.2f%%\n", parser.calculateYandexShare());
-
-        } catch (IOException e) {
-            System.err.println("Произошла ошибка при чтении файла: ");
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
+
+        System.out.println("Количество строк в файле: " + parser.getTotalLines());
+        System.out.println("Запросов от Googlebot: " + parser.getGoogleBotCount());
+        System.out.println("Запросов от YandexBot: " + parser.getYandexBotCount());
+
+        System.out.printf("Доля Googlebot: %.2f%%\n", parser.calculateGoogleShare());
+        System.out.printf("Доля YandexBot: %.2f%%\n", parser.calculateYandexShare());
+        System.out.println("Средний объём трафика сайта за час: " + stats.getTrafficRate());
     }
 }

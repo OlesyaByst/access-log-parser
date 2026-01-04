@@ -4,23 +4,23 @@ import java.util.regex.Pattern;
 public class LogParser {
     private static final Pattern FIRST_BRACKETS_PATTERN = Pattern.compile("\\((.*?)\\)");// текст внутри скобок
 
-    private int totalLines = 0; //счетчик строк
-    private int googleBotCount = 0; // счетчик бота гугл
+    private int totalLines = 0;
+    private int googleBotCount = 0;
     private int yandexBotCount = 0;
 
     public void parseLine(String line) {
-        if (line == null || line.isEmpty()) return; //!! строка пустая, конец
+        if (line == null || line.isEmpty()) return;
 
         totalLines++;
 
         Matcher matcher = FIRST_BRACKETS_PATTERN.matcher(line); //!!
-        if (matcher.find()) { //проверка на присутствие круглых скобок
-            String firstBrackets = matcher.group(1); // Текст внутри  скобок
-            String[] parts = firstBrackets.split(";"); //разбиваем текст на массив
+        if (matcher.find()) {
+            String firstBrackets = matcher.group(1);
+            String[] parts = firstBrackets.split(";");
 
-            if (parts.length >= 2) { // проверка на наличие 2х частей в скобках
-                String fragment = parts[1].trim(); //берем второй фрагмент и удаляем пробелы
-                String botName = fragment.split("/")[0].trim(); // Отделяем часть до слэша и удаляем пробелы
+            if (parts.length >= 2) {
+                String fragment = parts[1].trim();
+                String botName = fragment.split("/")[0].trim();
 
                 if ("Googlebot".equalsIgnoreCase(botName)) {
                     googleBotCount++;
