@@ -1,4 +1,8 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -43,6 +47,7 @@ public class Main {
                 try {
                     LogEntry entry = new LogEntry(line);
                     stats.addEntry(entry);
+
                 } catch (Exception e) {
                 }
             }
@@ -57,5 +62,21 @@ public class Main {
         System.out.printf("Доля Googlebot: %.2f%%\n", parser.calculateGoogleShare());
         System.out.printf("Доля YandexBot: %.2f%%\n", parser.calculateYandexShare());
         System.out.println("Средний объём трафика сайта за час: " + stats.getTrafficRate());
+        System.out.println(stats.getStatisticsOS());
+        System.out.println("Средний трафик в час: " + stats.getTrafficRate());
+
+        System.out.println("Статистика ОС:");
+        Map<String, Double> osProportions = stats.getOsProportions();
+        for (Map.Entry<String, Double> entry : osProportions.entrySet()) { //проходим по мапе и достаем ключ+значение
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+        System.out.println("\nСписок страниц с кодом 200:");
+        for (String page1 : stats.getIpAdresses200()) {
+            System.out.println(page1);
+        }
+        System.out.println("\nСписок страниц с кодом 404:");
+        for (String page2 : stats.getIpAdresses404()) {
+            System.out.println(page2);
+        }
     }
 }
