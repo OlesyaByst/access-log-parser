@@ -5,34 +5,51 @@ import java.util.HashSet;
 import java.util.Map;
 
 public class Statistics {
-    private long totalTraffic;
+    private long traffic;
     private LocalDateTime minTime;
     private LocalDateTime maxTime;
+    private int realVisits;
+    public int errorRequests; //ответы с ошибочными кодами
     private final HashSet<String> ipAdresses200 = new HashSet<>();
     private final HashSet<String> ipAdresses404 = new HashSet<>();
     private final HashMap<String, Integer> statisticsOS = new HashMap<>();
+    private final HashSet<String> uniqueUserIp = new HashSet<>();
+
+    public Statistics(int totalRealVisits) {
+        this.realVisits = 0;
+        this.traffic = 0;
+        this.maxTime = null;
+        this.minTime = null;
+    }
 
     public Statistics() {
-        this.totalTraffic = 0;
-        this.maxTime = LocalDateTime.MIN;
-        this.minTime = LocalDateTime.MAX;
     }
 
     public void addEntry(LogEntry entry) {
-        this.totalTraffic += entry.getResponseSize();
-        if (entry.getTime().isBefore(minTime)) minTime = entry.getTime();//сравниваем время
-        if (entry.getTime().isAfter(maxTime)) maxTime = entry.getTime();
+        this.traffic += entry.getResponseSize();
+        LocalDateTime entryTime = entry.getTime();
+
+        if (minTime == null || entryTime.isBefore(minTime)) minTime = entryTime;
+        //сравниваем время
+        if (maxTime == null || entryTime.isAfter(maxTime)) maxTime = entryTime;
         if (entry.getResponseCode() == 200) { //существующие
             ipAdresses200.add(entry.getPath());
         } else if (entry.getResponseCode() == 404) {
             ipAdresses404.add(entry.getPath());
+        } else if (entry.getResponseCode() >= 400 && entry.getResponseCode() <= 500) {
+            this.errorRequests++;
         }
+
 // проверка, есть ли в этом HashMap запись с таким браузером. Если нет, вставляйте такую запись. Если есть, добавляйте к соответствующему значению единицу.
         String os = entry.getUserAgent().getOperatingSystem();
         if (statisticsOS.containsKey(os)) {
             statisticsOS.put(os, statisticsOS.get(os) + 1);
         } else {
             statisticsOS.put(os, 1);
+        }
+        if (!entry.getUserAgent().isBot()) {
+            this.realVisits++;
+            this.uniqueUserIp.add(entry.getIpAddr());
         }
     }
 
@@ -58,14 +75,39 @@ public class Statistics {
 
     // Средний объём трафика сайта за час
     public double getTrafficRate() {
-        if (minTime == LocalDateTime.MAX || maxTime == LocalDateTime.MIN || minTime.equals(maxTime)) {
+        if (minTime == null || maxTime == null || minTime.equals(maxTime)) {
             return 0;
         }
 
-        long hours = Duration.between(minTime, maxTime).toHours();
+        double hours;
+        hours = (double) Duration.between(minTime, maxTime).toMillis() / 3600000;
         if (hours < 1) hours = 1;
-        return (double) totalTraffic / hours;
+        return (double) traffic / hours;
     }
+
+    //  подсчёт среднего количества посещений в час
+    public double getAvgUserVisitsPerHour() {
+        if (minTime == null || maxTime == null || minTime.equals(maxTime)) return 0;
+        double hours = Duration.between(minTime, maxTime).toMillis() / 3600000.0;
+        return realVisits / hours;
+    }
+
+
+    //метод подсчёта среднего количества ошибочных запросов в час.
+    public int getAvgWrongAnswersPerHour() {
+        if (minTime == null || maxTime == null || minTime.equals(maxTime)) return 0;
+        double hours = Duration.between(minTime, maxTime).toMillis() / 3600000.0;
+        return (int) (hours / errorRequests);
+    }
+
+    // метод расчёта средней посещаемости одним пользователем.
+    public double getAvgVisitsPerUser() {
+        if (uniqueUserIp.isEmpty()) {
+            return 0.0;
+        }
+        return (double) realVisits / uniqueUserIp.size();
+    }
+
 
     public HashSet<String> getIpAdresses200() {
         return ipAdresses200;
@@ -78,4 +120,5 @@ public class Statistics {
     public HashSet<String> getIpAdresses404() {
         return ipAdresses404;
     }
+
 }

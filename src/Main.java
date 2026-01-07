@@ -70,13 +70,18 @@ public class Main {
         for (Map.Entry<String, Double> entry : osProportions.entrySet()) { //проходим по мапе и достаем ключ+значение
             System.out.println(entry.getKey() + ": " + entry.getValue());
         }
-        System.out.println("\nСписок страниц с кодом 200:");
+       /* System.out.println("\nСписок страниц с кодом 200:");
         for (String page1 : stats.getIpAdresses200()) {
             System.out.println(page1);
         }
         System.out.println("\nСписок страниц с кодом 404:");
         for (String page2 : stats.getIpAdresses404()) {
             System.out.println(page2);
-        }
+      }
+
+        */
+        System.out.println("Среднее кол-во посещений в час: " + stats.getAvgUserVisitsPerHour());
+        System.out.println("Среднее кол-во ошибочных запросов в час: " + stats.getAvgWrongAnswersPerHour());
+        System.out.println("Средняя посещаемость одним пользователем: " + stats.getAvgUserVisitsPerHour());
     }
 }
