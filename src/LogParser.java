@@ -12,7 +12,12 @@ public class LogParser {
         if (line == null || line.isEmpty()) return;
 
         totalLines++;
-
+        String lowerLine = line.toLowerCase();
+        if (lowerLine.contains("googlebot")) {
+            googleBotCount++;
+        } else if (lowerLine.contains("yandexbot")) {
+            yandexBotCount++;
+        }
         Matcher matcher = FIRST_BRACKETS_PATTERN.matcher(line); //!!
         if (matcher.find()) {
             String firstBrackets = matcher.group(1);
@@ -21,12 +26,6 @@ public class LogParser {
             if (parts.length >= 2) {
                 String fragment = parts[1].trim();
                 String botName = fragment.split("/")[0].trim();
-
-                if ("Googlebot".equalsIgnoreCase(botName)) {
-                    googleBotCount++;
-                } else if ("YandexBot".equalsIgnoreCase(botName)) {
-                    yandexBotCount++;
-                }
             }
         }
     }

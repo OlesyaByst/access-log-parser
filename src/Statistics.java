@@ -92,7 +92,6 @@ public class Statistics {
         return realVisits / hours;
     }
 
-
     //метод подсчёта среднего количества ошибочных запросов в час.
     public int getAvgWrongAnswersPerHour() {
         if (minTime == null || maxTime == null || minTime.equals(maxTime)) return 0;
@@ -108,7 +107,6 @@ public class Statistics {
         return (double) realVisits / uniqueUserIp.size();
     }
 
-
     public HashSet<String> getIpAdresses200() {
         return ipAdresses200;
     }
@@ -120,5 +118,4 @@ public class Statistics {
     public HashSet<String> getIpAdresses404() {
         return ipAdresses404;
     }
-
 }

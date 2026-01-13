@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 public class LogEntry {
     private final String ipAddr, path, referer; //IP-адресу, путь
     private final LocalDateTime time;// дата
-    private final HttpMethod method;  //метод запроса
+    private final EHttpMethod method;  //метод запроса
     private final int responseCode, responseSize;//код ответа, размер
     private final UserAgent userAgent;
 
@@ -22,7 +22,7 @@ public class LogEntry {
             String dateStr = matcher.group(2);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH);
             this.time = LocalDateTime.parse(dateStr, formatter);
-            this.method = HttpMethod.valueOf(matcher.group(3));
+            this.method = EHttpMethod.valueOf(matcher.group(3));
             this.path = matcher.group(4);
             this.responseCode = Integer.parseInt(matcher.group(5));
             this.responseSize = Integer.parseInt(matcher.group(6));
@@ -31,7 +31,6 @@ public class LogEntry {
         } else {
             throw new IllegalArgumentException("Строка не соответствует формату лога: " + line);
         }
-
     }
 
     public String getIpAddr() {
@@ -54,7 +53,7 @@ public class LogEntry {
         return time;
     }
 
-    public HttpMethod getMethod() {
+    public EHttpMethod getMethod() {
         return method;
     }
 
@@ -64,9 +63,5 @@ public class LogEntry {
 
     public int getResponseSize() {
         return responseSize;
-    }
-
-    public enum HttpMethod {
-        GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD
     }
 }
