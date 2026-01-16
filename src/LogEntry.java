@@ -11,12 +11,22 @@ public class LogEntry {
     private final int responseCode, responseSize;//код ответа, размер
     private final UserAgent userAgent;
 
-    private static final String LOG_PATTERN =
-            "^(\\d+\\.\\d+\\.\\d+\\.\\d+) .* .* \\[(.*)\\] \"(\\w+) (.*) HTTP/.*\" (\\d+) (\\d+) \"(.*)\" \"(.*)\"";
+    private static final String IP_PART = "^(\\d+\\.\\d+\\.\\d+\\.\\d+)";
+    private static final String UNUSED_PART = " (?:.*?) (?:.*?) ";
+    private static final String TIME_PART = "\\[(.*?)\\]";
+    private static final String METHOD_PART = " \"(\\w+)";
+    private static final String PATH_PART = " (.*?) ";
+    private static final String PROTOCOL_PART = "HTTP/.*?\"";
+    private static final String CODE_PART = " (\\d+)";
+    private static final String SIZE_PART = " (\\d+)";
+    private static final String REFERER_PART = " \"(.*?)\"";
+    private static final String AGENT_PART = " \"(.*?)\"";
+    private static final Pattern LOG_PATTERN = Pattern.compile(
+            IP_PART + UNUSED_PART + TIME_PART + METHOD_PART + PATH_PART +
+                    PROTOCOL_PART + CODE_PART + SIZE_PART + REFERER_PART + AGENT_PART);
 
     public LogEntry(String line) {
-        Pattern pattern = Pattern.compile(LOG_PATTERN); // шаблон
-        Matcher matcher = pattern.matcher(line); // накладывает шаблон на строку
+        Matcher matcher = LOG_PATTERN.matcher(line); // накладывает шаблон на строку
         if (matcher.find()) {
             this.ipAddr = matcher.group(1);
             String dateStr = matcher.group(2);

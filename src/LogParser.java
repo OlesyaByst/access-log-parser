@@ -42,7 +42,6 @@ public class LogParser {
         return yandexBotCount;
     }
 
-
     public double calculateGoogleShare() {
         if (totalLines == 0) {
             return 0;

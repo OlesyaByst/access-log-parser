@@ -35,10 +35,8 @@ public class Main {
             }
         }
 
-
         LogParser parser = new LogParser();
         Statistics stats = new Statistics();
-
 
         try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
             String line;
@@ -52,7 +50,7 @@ public class Main {
                 }
             }
         } catch (IOException ex) {
-            System.out.println("Ошибка доступа");
+            throw new RuntimeException(ex);
         }
 
         System.out.println("Количество строк в файле: " + parser.getTotalLines());

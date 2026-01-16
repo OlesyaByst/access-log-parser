@@ -1,3 +1,10 @@
 public enum EHttpMethod {
-    GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD
+
+    GET,
+    POST,
+    PUT,
+    DELETE,
+    PATCH,
+    OPTIONS,
+    HEAD
 }
