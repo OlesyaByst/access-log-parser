@@ -7,22 +7,32 @@ import java.util.regex.Pattern;
 public class LogEntry {
     private final String ipAddr, path, referer; //IP-адресу, путь
     private final LocalDateTime time;// дата
-    private final HttpMethod method;  //метод запроса
+    private final EHttpMethod method;  //метод запроса
     private final int responseCode, responseSize;//код ответа, размер
     private final UserAgent userAgent;
 
-    private static final String LOG_PATTERN =
-            "^(\\d+\\.\\d+\\.\\d+\\.\\d+) .* .* \\[(.*)\\] \"(\\w+) (.*) HTTP/.*\" (\\d+) (\\d+) \"(.*)\" \"(.*)\"";
+    private static final String IP_PART = "^(\\d+\\.\\d+\\.\\d+\\.\\d+)";
+    private static final String UNUSED_PART = " (?:.*?) (?:.*?) ";
+    private static final String TIME_PART = "\\[(.*?)\\]";
+    private static final String METHOD_PART = " \"(\\w+)";
+    private static final String PATH_PART = " (.*?) ";
+    private static final String PROTOCOL_PART = "HTTP/.*?\"";
+    private static final String CODE_PART = " (\\d+)";
+    private static final String SIZE_PART = " (\\d+)";
+    private static final String REFERER_PART = " \"(.*?)\"";
+    private static final String AGENT_PART = " \"(.*?)\"";
+    private static final Pattern LOG_PATTERN = Pattern.compile(
+            IP_PART + UNUSED_PART + TIME_PART + METHOD_PART + PATH_PART +
+                    PROTOCOL_PART + CODE_PART + SIZE_PART + REFERER_PART + AGENT_PART);
 
     public LogEntry(String line) {
-        Pattern pattern = Pattern.compile(LOG_PATTERN); // шаблон
-        Matcher matcher = pattern.matcher(line); // накладывает шаблон на строку
+        Matcher matcher = LOG_PATTERN.matcher(line); // накладывает шаблон на строку
         if (matcher.find()) {
             this.ipAddr = matcher.group(1);
             String dateStr = matcher.group(2);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH);
             this.time = LocalDateTime.parse(dateStr, formatter);
-            this.method = HttpMethod.valueOf(matcher.group(3));
+            this.method = EHttpMethod.valueOf(matcher.group(3));
             this.path = matcher.group(4);
             this.responseCode = Integer.parseInt(matcher.group(5));
             this.responseSize = Integer.parseInt(matcher.group(6));
@@ -31,7 +41,6 @@ public class LogEntry {
         } else {
             throw new IllegalArgumentException("Строка не соответствует формату лога: " + line);
         }
-
     }
 
     public String getIpAddr() {
@@ -54,7 +63,7 @@ public class LogEntry {
         return time;
     }
 
-    public HttpMethod getMethod() {
+    public EHttpMethod getMethod() {
         return method;
     }
 
@@ -64,9 +73,5 @@ public class LogEntry {
 
     public int getResponseSize() {
         return responseSize;
-    }
-
-    public enum HttpMethod {
-        GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD
     }
 }

@@ -26,7 +26,6 @@ public class UserAgent {
         };
     }
 
-
     // проверка на бота
     public boolean isBot() {
         if (rawString == null) return false;

@@ -79,9 +79,7 @@ public class Statistics {
             return 0;
         }
 
-        double hours;
-        hours = (double) Duration.between(minTime, maxTime).toMillis() / 3600000;
-        if (hours < 1) hours = 1;
+        double hours = Duration.between(minTime, maxTime).toHours();
         return (double) traffic / hours;
     }
 
@@ -91,7 +89,6 @@ public class Statistics {
         double hours = Duration.between(minTime, maxTime).toMillis() / 3600000.0;
         return realVisits / hours;
     }
-
 
     //метод подсчёта среднего количества ошибочных запросов в час.
     public int getAvgWrongAnswersPerHour() {
@@ -108,7 +105,6 @@ public class Statistics {
         return (double) realVisits / uniqueUserIp.size();
     }
 
-
     public HashSet<String> getIpAdresses200() {
         return ipAdresses200;
     }
@@ -120,5 +116,4 @@ public class Statistics {
     public HashSet<String> getIpAdresses404() {
         return ipAdresses404;
     }
-
 }
